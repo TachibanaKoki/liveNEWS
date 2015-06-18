@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>content</title>
+    <script src="https://www.google.com/jsapi"></script>
+    <script>
+        google.load("feeds","1");
+        function Category(URL) {
+                var main =URL;
+                var nextLink="Article.html";
+            google.feeds.lookupFeed(main, function (result) {  
+                if (!result.error) { 
+                    if (result.url != null) {  
+                        var feed = new google.feeds.Feed(result.url);
+                        feed.setNumEntries(4);// 読み込む記事の最大数
+                        feed.load(function (result) {
+                            if (!result.error) { 
+                                var container = document.getElementById("box1");
+                                var htmlstr = "";
+                                htmlstr += '<h2><a href="' + nextLink + '">' + result.feed.title +'</a></h2>'; // カテゴリータイトル
+                                //先頭の記事のみ本文を表示
+                                    var entry = result.feed.entries[0];
+                                    //タイトルとリンク
+                                    htmlstr += '<h3><a href="' + nextLink + '"onclick="Storage('+URL+','+0+')">' + entry.title + '</a></h3>';
+
+                                    htmlstr +=  entry.content;
+                                    var pdate = new Date(entry.publishedDate);
+                                    var strdate = (pdate.getMonth() + 1) + '月' + pdate.getDate() + '日';
+                                    htmlstr += '<p>日付 :' + strdate + '</p>';
+                                    htmlstr += '</p>';
+                                    htmlstr+='関連記事';
+                                for (var i = 0; i < result.feed.entries.length; i++) {
+                                    //タイトルと概要と日付を出力
+                                    var entry = result.feed.entries[i];
+
+                                    htmlstr += '<h3><a href="' + nextLink + '"onclick="Storage('+URL+','+i+')">' + entry.title + '</a></h3>';
+                                }
+                                container.innerHTML = htmlstr;
+                            } else {
+                                //エラーをアラート
+                                alert(result.error.code + ":" + result.error.message);
+                            }
+                        });
+                    }
+                } else {
+                    var container = document.getElementById("box1");
+                    container.innerHTML = "フィードがありません";
+                }
+            });
+        }
+        function Storage(URL,i)
+        {
+            //webStorage
+            var st=window.localStorage;
+            String(i);
+            st.setItem("URL",URL);
+            st.setItem("num",i);
+        }
+    </script>
+</head>
+<body>
+    <form>
+        <input type="button" onclick="Category('http://news.livedoor.com/topics/rss/top.xml')" value="主要"> 
+        <input type="button" onclick="Category('http://news.livedoor.com/topics/rss/dom.xml')" value="国内">
+        <input type="button" onclick="Category('http://news.livedoor.com/topics/rss/int.xml')" value="海外">
+        <input type="button" onclick="Category('http://news.livedoor.com/topics/rss/eco.xml')" value="IT/経済">
+        <input type="button" onclick="Category('http://news.livedoor.com/topics/rss/ent.xml')" value="芸能">
+        <input type="button" onclick="Category('http://news.livedoor.com/topics/rss/spo.xml')" value="スポーツ">
+        <input type="button" onclick="Category('http://news.livedoor.com/topics/rss/52.xml')" value="映画">
+        <input type="button" onclick="Category('http://news.livedoor.com/topics/rss/gourmet.xml')" value="グルメ">
+        <input type="button" onclick="Category('http://news.livedoor.com/topics/rss/love.xml')" value="女子">
+        <input type="button" onclick="Category('http://news.livedoor.com/topics/rss/trend.xml')" value="トレンド">
+    </form>
+    <div id="box1"></div>
+    <script>Category('http://news.livedoor.com/topics/rss/top.xml');
+    </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>MEWS</title>
+ <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script>
+ 
+    google.load("feeds", "1");
+
+        function　Content() {
+            var URL=st.getItem("URL");
+           // var num=st.getItem("num");
+            //  Number(num);
+                var main =URL;
+                var nextLink="C:/Users/kouki/Desktop/html/newhtml02.html";
+            google.feeds.lookupFeed(main, function (result) {  
+                if (!result.error) { 
+                    if (result.url != null) {  
+                        var feed = new google.feeds.Feed(result.url);
+                        feed.setNumEntries(4);// 読み込む記事の最大数
+                        feed.load(function (result) {
+                            if (!result.error) { 
+                                var container = document.getElementById("box1");
+                                var htmlstr = "";
+                                htmlstr += '<h2><a href="' + result.feed.link + '">' + result.feed.title + '</a></h2>'; // カテゴリータイトル
+                                //指定された順番の記事のみ本文を表示
+                                    var entry = result.feed.entries[0];
+
+                                    htmlstr += '<h3><a href="' + entry.link + '">' + entry.title + '</a></h3>';
+
+                                    htmlstr +=  entry.content;
+                                    var pdate = new Date(entry.publishedDate);
+                                    var strdate = (pdate.getMonth() + 1) + '月' + pdate.getDate() + '日';
+                                    htmlstr += '<p>日付 :' + strdate + '</p>';
+                                    htmlstr += '</p>';
+                                    htmlstr+='関連記事';
+                                    var numcheck=false;
+                                for (var i = 0; i < result.feed.entries.length; i++) {
+                                    if(numcheck!=true&&i==4){//記事に被りがなければ上位３の記事を表示
+                                        break;
+                                    }
+                                    if(!i==0){//記事の番号がかぶっていなければ
+                                    //タイトルと概要と日付を出力
+                                    var entry = result.feed.entries[i];
+                                    htmlstr += '<h3><a href="' + entry.link + '"onclick="Storage('+URL+','+i+')">' + entry.title + '</a></h3>';
+                                }
+                                else numcheck=true;
+                               
+                              
+                                }
+                                container.innerHTML = htmlstr;
+                            } else {
+                                //エラーをアラート
+                                alert(result.error.code + ":" + result.error.message);
+                            }
+                        });
+                    }
+                } else {
+                    var container = document.getElementById("box1");
+                    container.innerHTML = "フィードがありません";
+                }
+            });
+        }
+</script>
+</head>
+<body>
+
+<p>最新記事の表示</p>
+<div id="box1"> </div>
+<script>Content();</script>
+</body>
+</html>
